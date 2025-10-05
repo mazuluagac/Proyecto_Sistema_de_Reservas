@@ -4,15 +4,15 @@ Microservicio de seguridad y autenticación desarrollado con Laravel 8 y MySQL/M
 
 ## 🚀 Características
 
-- ✅ **Autenticación JWT** con Laravel Sanctum
-- ✅ **Sistema de roles** (Admin/Usuario)
+- ✅ **Autenticación con tokens** usando Laravel Sanctum
+- ✅ **Sistema de roles básico** (admin/usuario)
 - ✅ **Registro de usuarios** con validación
-- ✅ **Login/Logout** seguro
-- ✅ **Recuperación de contraseña** por email
-- ✅ **Middleware de autorización** por roles
-- ✅ **Validación de datos** robusta
-- ✅ **Respuestas JSON** estandarizadas
-- ✅ **Protección CSRF** y rate limiting
+- ✅ **Login/Logout** funcional
+- ✅ **Recuperación de contraseña** (estructura básica)
+- ✅ **Middleware de roles** personalizado
+- ✅ **Validación de datos** con Laravel Validator
+- ✅ **Respuestas JSON** consistentes
+- ✅ **Base para rate limiting** (Laravel por defecto)
 
 ## 🛠️ Tecnologías
 
@@ -149,6 +149,8 @@ Content-Type: application/json
 }
 ```
 
+**Nota:** Requiere configuración de email en `.env` para funcionar completamente.
+
 #### Resetear Contraseña
 ```http
 POST /api/reset-password
@@ -207,16 +209,18 @@ Authorization: Bearer {token}
 ### 👨‍💼 Endpoints Solo para Admins
 
 ```http
-GET /api/admin-only-endpoint
+GET /api/admin-example
 Authorization: Bearer {admin_token}
 ```
+*Nota: Actualmente no hay endpoints específicos implementados, pero la estructura está lista.*
 
 ### 👤 Endpoints Solo para Usuarios
 
 ```http
-GET /api/user-only-endpoint
+GET /api/user-example  
 Authorization: Bearer {user_token}
 ```
+*Nota: Actualmente no hay endpoints específicos implementados, pero la estructura está lista.*
 
 ## 🎭 Sistema de Roles
 
@@ -227,21 +231,6 @@ Authorization: Bearer {user_token}
 | `admin` | Administrador del sistema | Acceso completo a todas las funcionalidades |
 | `usuario` | Usuario regular | Acceso limitado a funcionalidades básicas |
 
-### Middleware de Roles
-
-Para proteger rutas por rol, usa el middleware `role`:
-
-```php
-// Solo administradores
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
-});
-
-// Solo usuarios regulares
-Route::middleware(['auth:sanctum', 'role:usuario'])->group(function () {
-    Route::get('/user/profile', [UserController::class, 'profile']);
-});
-```
 
 ## 📁 Estructura del Proyecto
 
@@ -264,31 +253,6 @@ auth-microservice/
 └── README.md
 ```
 
-## 🔧 Configuración Avanzada
-
-### Variables de Entorno Importantes
-
-```env
-# Base de datos
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=auth_microservice
-DB_USERNAME=root
-DB_PASSWORD=
-
-# Email (para reset de contraseña)
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=tu_email@gmail.com
-MAIL_PASSWORD=tu_app_password
-MAIL_ENCRYPTION=tls
-
-# Sanctum
-SANCTUM_STATEFUL_DOMAINS=localhost:3000,127.0.0.1:3000
-```
-
 ### Crear Usuario Administrador
 
 ```bash
@@ -307,40 +271,6 @@ User::create([
 ]);
 ```
 
-## 🧪 Pruebas
-
-### Usando cURL
-
-```bash
-# Registro
-curl -X POST http://localhost:8000/api/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test User",
-    "email": "test@example.com",
-    "password": "password123",
-    "password_confirmation": "password123"
-  }'
-
-# Login
-curl -X POST http://localhost:8000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "password": "password123"
-  }'
-
-# Obtener usuario (reemplazar TOKEN)
-curl -X GET http://localhost:8000/api/me \
-  -H "Authorization: Bearer TOKEN"
-```
-
-### Usando Postman
-
-1. **Importar Collection:** Puedes crear una collection de Postman con todos los endpoints
-2. **Variables de entorno:** Configura `{{base_url}}` como `http://localhost:8000`
-3. **Token automático:** Usa scripts de Postman para guardar el token automáticamente
-
 ## 🚨 Códigos de Respuesta
 
 | Código | Descripción |
@@ -358,20 +288,11 @@ curl -X GET http://localhost:8000/api/me \
 ### Medidas Implementadas
 
 - **Hashing de contraseñas** con Bcrypt
-- **Tokens de acceso únicos** con Sanctum
-- **Validación robusta** de todos los inputs
-- **Rate limiting** automático
-- **Protección CSRF** habilitada
-- **Middleware de autorización** por roles
-- **Sanitización de datos** automática
-
-### Recomendaciones
-
-- Usar HTTPS en producción
-- Configurar rate limiting personalizado
-- Implementar logs de seguridad
-- Rotar tokens periódicamente
-- Validar datos en el frontend también
+- **Tokens de acceso** con Laravel Sanctum
+- **Validación básica** de inputs
+- **Middleware de roles** personalizado
+- **Estructura para rate limiting** (Laravel por defecto)
+- **Protección básica** contra inyección SQL (Eloquent ORM)
 
 ## 🐛 Troubleshooting
 
@@ -394,17 +315,5 @@ php artisan migrate:fresh
 **Error 403 (Forbidden):**
 - Verificar que el usuario tenga el rol correcto
 - Verificar que el middleware esté registrado
-
-## 📞 Soporte
-
-Para reportar bugs o solicitar features:
-- Crear un issue en el repositorio
-- Contactar al equipo de desarrollo
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT.
-
----
 
 Desarrollado con ❤️ para el curso de Ingeniería de Software II
