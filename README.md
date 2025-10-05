@@ -34,10 +34,10 @@ Ejemplo de puertos sugeridos:
 | Servicio | Puerto |
 |-----------|--------|
 | Auth | 8000 |
-| Reservas | 8001 |
-| Reportes | 8002 |
-| Notificaciones | 8003 |
-| Auditoría | 8004 |
+| Reservas |  |
+| Reportes | 8001 |
+| Notificaciones | 5000 |
+| Auditoría |  |
 
 Ejecuta cada microservicio según las instrucciones específicas en su respectivo `README.md`.
 
