@@ -316,4 +316,11 @@ php artisan migrate:fresh
 - Verificar que el usuario tenga el rol correcto
 - Verificar que el middleware esté registrado
 
-Desarrollado con ❤️ para el curso de Ingeniería de Software II
+---
+
+## 🧾 Autor y repositorio
+
+- Autor: Manuela Zuluaga Cardona
+- Repositorio principal: https://github.com/mazuluagac/Proyecto_Sistema_de_Reservas.git
+
+---
