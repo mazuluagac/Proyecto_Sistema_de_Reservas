@@ -65,4 +65,11 @@ Archivos relevantes:
 - `reports/views.py` (ReservaViewSet, ReporteExcelView, ReportePDFView)
 - `reports/urls.py` (router y rutas de reportes)
 
-Desarrollado con ❤️ para el curso de Ingeniería de Software II
+---
+
+## 🧾 Autor y repositorio
+
+- Autor: Manuela Zuluaga Cardona
+- Repositorio principal: https://github.com/mazuluagac/Proyecto_Sistema_de_Reservas.git
+
+---
