@@ -1,21 +1,21 @@
-# Reports Microservice
+ # 📊 Reports Microservice
 
 Este microservicio provee un CRUD de reservas y generación de reportes en Excel y PDF.
 
-## Descripción
+## 📝 Descripción
 
 Permite gestionar reservas (crear, listar, actualizar, eliminar) y descargar reportes de todas las reservas en formato Excel (.xlsx) y PDF (.pdf).
 
-## Tecnologías utilizadas
+## 🛠️ Tecnologías utilizadas
 
 - Python 3.10+
 - Django 5.2.x
 - Django REST Framework
-- MySQL (según configuración en settings.py)
-- openpyxl (para reportes Excel)
-- reportlab (para reportes PDF)
+- MySQL (según configuración en `settings.py`)
+- `openpyxl` (para reportes Excel)
+- `reportlab` (para reportes PDF)
 
-## Ejecución local
+## ⚙️ Ejecución local
 
 1. Instala las dependencias mínimas:
 
@@ -38,25 +38,31 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-## Endpoints implementados
+## 📦 Modelo: Reserva
 
-- CRUD de reservas:
-	- GET  `/api/reports/reservas/` → lista de reservas
-	- POST `/api/reports/reservas/` → crear reserva
-	- GET  `/api/reports/reservas/{id}/` → detalle
-	- PUT/PATCH `/api/reports/reservas/{id}/` → actualizar
-	- DELETE `/api/reports/reservas/{id}/` → eliminar
+| Campo   | Tipo      | Detalles |
+|---------|-----------|----------|
+| usuario | CharField | max_length=100 |
+| estado  | CharField | choices: `pendiente`, `confirmada`, `cancelada` (default `pendiente`) |
+| fecha   | DateField |  |
 
-- Reportes:
-	- GET `/api/reports/excel/` → descarga archivo Excel con todas las reservas
-	- GET `/api/reports/pdf/` → descarga archivo PDF con todas las reservas
+Archivo: `reports/models.py`
 
-## Notas
+## 🚪 Endpoints implementados
 
-- No hay autenticación ni permisos personalizados (AllowAny por defecto).
-- Los reportes se generan en memoria y se envían como attachment.
-- El archivo de tests existe pero no contiene pruebas implementadas.
+| Ruta | Método | Descripción | Payload / Respuesta |
+|------|--------|-------------|---------------------|
+| `/api/reports/reservas/` | GET | Listar reservas | JSON list de reservas |
+| `/api/reports/reservas/` | POST | Crear reserva | JSON: `{"usuario": "...", "estado": "...", "fecha": "YYYY-MM-DD"}` |
+| `/api/reports/reservas/{id}/` | GET | Detalle de reserva | JSON con campos de la reserva |
+| `/api/reports/reservas/{id}/` | PUT/PATCH | Actualizar reserva | JSON con campos a actualizar |
+| `/api/reports/reservas/{id}/` | DELETE | Eliminar reserva | 204 No Content (esperado) |
+| `/api/reports/excel/` | GET | Descargar reporte Excel (attachment) | Archivo `.xlsx` con columnas ID, Usuario, Estado, Fecha |
+| `/api/reports/pdf/` | GET | Descargar reporte PDF (attachment) | Archivo `.pdf` con listado de reservas |
 
----
+Archivos relevantes:
+- `reports/serializers.py` (ReservaSerializer)
+- `reports/views.py` (ReservaViewSet, ReporteExcelView, ReportePDFView)
+- `reports/urls.py` (router y rutas de reportes)
 
-Este README refleja únicamente lo que está implementado en el código del microservicio.
+Desarrollado con ❤️ para el curso de Ingeniería de Software II
