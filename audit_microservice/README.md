@@ -1,5 +1,3 @@
----
----
 # 🕵️‍♂️ Microservicio de Auditoría
 
 Microservicio en **Flask** para registrar y consultar eventos de auditoría en **MongoDB**. Diseñado para ser pequeño, fácil de probar e integrar en arquitecturas de microservicios.
