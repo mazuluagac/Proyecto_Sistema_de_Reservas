@@ -37,7 +37,7 @@ Ejemplo de puertos sugeridos:
 | Reservas |  |
 | Reportes | 8001 |
 | Notificaciones | 5000 |
-| Auditoría |  |
+| Auditoría | 5004 |
 
 Ejecuta cada microservicio según las instrucciones específicas en su respectivo `README.md`.
 
@@ -46,3 +46,11 @@ Ejecuta cada microservicio según las instrucciones específicas en su respectiv
 ## 🚀 Objetivo general
 
 Aplicar una arquitectura basada en **microservicios desacoplados**, que permita escalar, mantener y desplegar de manera independiente los módulos del sistema.
+
+---
+
+## 🧾 Autor
+
+- Autor: Manuela Zuluaga Cardona
+
+---
