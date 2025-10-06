@@ -34,8 +34,17 @@ python manage.py migrate
 
 4. Inicia el servidor:
 
+- Si ejecutas `python manage.py` sin argumentos, el proyecto iniciará por defecto en el puerto **8000** , 
+para ejecutarlo en otro puerto, seguido de la instrucción `runserver` indica el puerto deseado (por ejemplo `python manage.py runserver 8001`).
+
 ```powershell
-python manage.py runserver
+python manage.py
+```
+
+- Alternativamente, puedes indicar explícitamente el puerto (por ejemplo 8001):
+
+```powershell
+python manage.py runserver 8001
 ```
 
 ## 📦 Modelo: Reserva
