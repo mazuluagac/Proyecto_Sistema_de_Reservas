@@ -48,8 +48,6 @@ composer install
 # Copiar archivo de configuración
 cp .env.example .env
 
-# Generar clave de aplicación
-php artisan key:generate
 ```
 
 ### 4. Configurar base de datos
@@ -250,8 +248,32 @@ auth-microservice/
 │       └── create_users_table.php       # Migración con campo role
 ├── routes/
 │   └── api.php                          # Definición de rutas API
+├── locust/
+│   ├── locust_auth.py                    # Archivo de pruebas de rendimiento con Locust
+│   └── reports/                         # Carpeta donde se almacenan los reportes generados
 └── README.md
+
 ```
+## 🧪 Pruebas de Rendimiento con Locust
+
+Este microservicio incluye una carpeta llamada `locust/` con un archivo de configuración (`locust_auth.py`) diseñado para ejecutar pruebas de rendimiento al microservicio de autenticación.
+
+Los resultados de las pruebas se han almacenado en la subcarpeta `locust/reports/`.
+
+## ⚙️ Base de Datos para Pruebas
+
+Para evitar sobrecargar o alterar los datos de producción, se ha creado una base de datos dedicada exclusivamente para pruebas de rendimiento:
+
+- **Base de datos real:** auth_db
+
+- **Base de datos de pruebas:** auth_db_test
+
+🧩 Para utilizar la base de datos de pruebas, simplemente cambia el nombre en el archivo `.env`:
+
+```env
+DB_DATABASE=auth_db_test
+```
+Esto permite realizar pruebas de carga de forma segura sin afectar los datos reales del sistema.
 
 ### Crear Usuario Administrador
 
