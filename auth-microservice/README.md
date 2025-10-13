@@ -275,7 +275,22 @@ DB_DATABASE=auth_db_test
 ```
 Esto permite realizar pruebas de carga de forma segura sin afectar los datos reales del sistema.
 
-### Crear Usuario Administrador
+### Para ejecutar las pruebas de rendimiento:
+1. Asegúrate de tener Locust instalado. Si no lo tienes, puedes instalarlo usando pip:
+   ```bash
+   pip install locust
+   ```  
+2. Navega a la carpeta `locust/`:
+   ```bash
+   cd locust
+   ```  
+3. Ejecuta Locust especificando el archivo de pruebas:
+   ```bash
+   locust -f locust_auth.py --host=http://localhost:8000
+   ```
+4. Abre tu navegador y ve a `http://localhost:8089` para acceder a la interfaz web de Locust.
+
+## 👷‍♂️ Crear Usuario Administrador
 
 ```bash
 php artisan tinker
