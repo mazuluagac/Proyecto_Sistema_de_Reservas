@@ -34,7 +34,7 @@ Ejemplo de puertos sugeridos:
 | Servicio | Puerto |
 |-----------|--------|
 | Auth | 8000 |
-| Reservas |  |
+| Reservas | 8002 |
 | Reportes | 8001 |
 | Notificaciones | 5000 |
 | Auditoría | 5004 |
