@@ -254,6 +254,7 @@ auth-microservice/
 └── README.md
 
 ```
+---
 ## 🧪 Pruebas de Rendimiento con Locust
 
 Este microservicio incluye una carpeta llamada `locust/` con un archivo de configuración (`locust_auth.py`) diseñado para ejecutar pruebas de rendimiento al microservicio de autenticación.
@@ -289,6 +290,8 @@ Esto permite realizar pruebas de carga de forma segura sin afectar los datos rea
    locust -f locust_auth.py --host=http://localhost:8000
    ```
 4. Abre tu navegador y ve a `http://localhost:8089` para acceder a la interfaz web de Locust.
+
+---
 
 ## 👷‍♂️ Crear Usuario Administrador
 

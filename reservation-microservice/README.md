@@ -24,7 +24,74 @@ Principales características:
 
 ---
 
-## 📋 Requisitos previos
+## 📁 Estructura del Proyecto
+
+```
+reservation-microservice/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/                # Controlador de reservas
+│   │   │   └── ReservaController.php
+│   │   ├── Middleware/                 # Middlewares HTTP
+│   │   └── Kernel.php                  # Registro de middleware
+│   └── Models/
+│       ├── Reserva.php                 # Modelo de reserva
+│       └── User.php                    # Modelo de usuario
+├── database/
+│   ├── migrations/
+│   │   ├── 2025_10_03_011917_create_reservas_table.php   # Migración reservas
+│   │   └── ...                         # Otras migraciones
+│   └── seeders/
+│       └── DatabaseSeeder.php          # Seeder principal
+├── routes/
+│   ├── api.php                         # Definición de rutas API
+├── locust/
+│   ├── locust_reservation.py           # Archivo de pruebas de rendimiento con Locust
+│   └── reports/                        # Carpeta donde se almacenan los reportes generados
+└── README.md
+```
+
+---
+---
+## 🧪 Pruebas de Rendimiento con Locust
+
+Este microservicio incluye una carpeta llamada `locust/` con un archivo de configuración (`locust_auth.py`) diseñado para ejecutar pruebas de rendimiento al microservicio de autenticación.
+
+Los resultados de las pruebas se han almacenado en la subcarpeta `locust/reports/`.
+
+## ⚙️ Base de Datos para Pruebas
+
+Para evitar sobrecargar o alterar los datos de producción, se ha creado una base de datos dedicada exclusivamente para pruebas de rendimiento:
+
+- **Base de datos real:** reservations_db
+
+- **Base de datos de pruebas:** reservations_db_test
+
+🧩 Para utilizar la base de datos de pruebas, simplemente cambia el nombre en el archivo `.env`:
+
+```env
+DB_DATABASE=reservations_db_test
+```
+Esto permite realizar pruebas de carga de forma segura sin afectar los datos reales del sistema.
+
+### Para ejecutar las pruebas de rendimiento:
+1. Asegúrate de tener Locust instalado. Si no lo tienes, puedes instalarlo usando pip:
+   ```bash
+   pip install locust
+   ```  
+2. Navega a la carpeta `locust/`:
+   ```bash
+   cd locust
+   ```  
+3. Ejecuta Locust especificando el archivo de pruebas:
+   ```bash
+   locust -f locust_reservation.py 
+   ```
+4. Abre tu navegador y ve a `http://localhost:8089` para acceder a la interfaz web de Locust.
+
+---
+
+## �📋 Requisitos previos
 
 - PHP >= 8.0 (ver composer.json para versión exacta)
 - Composer
@@ -41,19 +108,15 @@ Sigue estos pasos en PowerShell (Windows) desde la raíz del proyecto:
 # 1. Instalar dependencias PHP
 composer install
 
-# 2. Copiar archivo de entorno y generar una clave
-Copy-Item .env.example .env
-php artisan key:generate
+# 2. Configurar las variables de entorno en .env (ver sección "Configuración")
 
-# 3. Configurar las variables de entorno en .env (ver sección "Configuración")
+# 3. Ejecutar migraciones 
+php artisan migrate --
 
-# 4. Ejecutar migraciones y seeders (si aplica)
-php artisan migrate --seed
+# 4. Ejecutar el servidor de desarrollo
+php artisan serve --host=127.0.0.1 --port=8002
 
-# 5. Ejecutar el servidor de desarrollo
-php artisan serve --host=127.0.0.1 --port=8000
-
-# Ahora la API estará disponible en: http://127.0.0.1:8000 (o el puerto configurado)
+# Ahora la API estará disponible en: http://127.0.0.1:8002 (o el puerto configurado)
 ```
 ---
 
