@@ -72,12 +72,6 @@ Listar eventos:
 curl http://localhost:5004/audit
 ```
 
-Filtrar eventos:
-
-```powershell
-curl "http://localhost:5004/audit/buscar?action=login&user_id=user123"
-```
-
 ---
 
 ## 🗂️ Modelo de datos
@@ -92,6 +86,27 @@ Documento almacenado en la colección `audit_db`:
    "details": { }
 }
 ```
+
+## 🧪 Pruebas de Rendimiento con Locust
+
+Este microservicio incluye una carpeta llamada `locust/` con un archivo de configuración (`locust_audit.py`) diseñado para ejecutar pruebas de rendimiento al microservicio de Auditoría.
+
+Los resultados de las pruebas se han almacenado en la subcarpeta `locust/reports/`.
+
+## ⚙️ Base de Datos para Pruebas
+
+Para evitar sobrecargar o alterar los datos de producción, se ha creado una base de datos dedicada exclusivamente para pruebas de rendimiento:
+
+- **Base de datos real:** audit_db
+
+- **Base de datos de pruebas:** audit_db_test
+
+🧩 Para utilizar la base de datos de pruebas, simplemente cambia el nombre en el archivo `app.py`:
+
+```
+auditoria_collection = db["audit_db_test"]
+```
+Esto permite realizar pruebas de carga de forma segura sin afectar los datos reales del sistema.
 ---
 
 ## 🧾 Autor y repositorio
