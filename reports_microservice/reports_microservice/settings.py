@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'reports_microservice.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'reports_db',
+        'NAME': 'reservation_db',
         'USER': 'root',
         'PASSWORD': '',  # en Laragon root no tiene contraseña
         'HOST': '127.0.0.1',

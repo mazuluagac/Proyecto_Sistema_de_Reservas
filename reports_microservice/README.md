@@ -1,10 +1,11 @@
  # 📊 Reports Microservice
 
-Este microservicio provee un CRUD de reservas y generación de reportes en Excel y PDF.
+
+Este microservicio está dedicado exclusivamente a la generación de reportes en Excel y PDF a partir de la tabla real `reservas` de la base de datos.
 
 ## 📝 Descripción
 
-Permite gestionar reservas (crear, listar, actualizar, eliminar) y descargar reportes de todas las reservas en formato Excel (.xlsx) y PDF (.pdf).
+Permite descargar reportes de todas las reservas en formato Excel (.xlsx) y PDF (.pdf), con formato estético y todos los campos relevantes. No expone endpoints CRUD.
 
 ## 🛠️ Tecnologías utilizadas
 
@@ -32,47 +33,67 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
+
 4. Inicia el servidor:
 
-- Si ejecutas `python manage.py` sin argumentos, el proyecto iniciará por defecto en el puerto **8000** , 
-para ejecutarlo en otro puerto, seguido de la instrucción `runserver` indica el puerto deseado (por ejemplo `python manage.py runserver 8001`).
+- Si ejecutas `python manage.py` sin argumentos, el proyecto iniciará por defecto en el puerto **8001**.
 
 ```powershell
 python manage.py
 ```
 
-- Alternativamente, puedes indicar explícitamente el puerto (por ejemplo 8001):
+- Alternativamente, puedes indicar explícitamente el puerto:
 
 ```powershell
 python manage.py runserver 8001
 ```
 
+
 ## 📦 Modelo: Reserva
 
-| Campo   | Tipo      | Detalles |
-|---------|-----------|----------|
-| usuario | CharField | max_length=100 |
-| estado  | CharField | choices: `pendiente`, `confirmada`, `cancelada` (default `pendiente`) |
-| fecha   | DateField |  |
+| Campo         | Tipo           | Detalles                                      |
+|---------------|----------------|-----------------------------------------------|
+| id            | AutoField      | Clave primaria (autoincremental)              |
+| usuario_id    | IntegerField   | ID de usuario (relación o referencia externa) |
+| nombre_usuario| CharField      | Nombre del usuario (max_length=100)           |
+| fecha_inicio  | DateField      | Fecha de inicio de la reserva                 |
+| fecha_fin     | DateField      | Fecha de fin de la reserva                    |
+| descripcion   | CharField      | Descripción de la reserva (max_length=255)    |
+| estado        | CharField      | `pendiente`, `confirmada`, `cancelada`        |
+| created_at    | DateTimeField  | Fecha de creación (auto)                      |
+| updated_at    | DateTimeField  | Fecha de actualización (auto)                 |
 
 Archivo: `reports/models.py`
 
+
 ## 🚪 Endpoints implementados
 
-| Ruta | Método | Descripción | Payload / Respuesta |
-|------|--------|-------------|---------------------|
-| `/api/reports/reservas/` | GET | Listar reservas | JSON list de reservas |
-| `/api/reports/reservas/` | POST | Crear reserva | JSON: `{"usuario": "...", "estado": "...", "fecha": "YYYY-MM-DD"}` |
-| `/api/reports/reservas/{id}/` | GET | Detalle de reserva | JSON con campos de la reserva |
-| `/api/reports/reservas/{id}/` | PUT/PATCH | Actualizar reserva | JSON con campos a actualizar |
-| `/api/reports/reservas/{id}/` | DELETE | Eliminar reserva | 204 No Content (esperado) |
-| `/api/reports/excel/` | GET | Descargar reporte Excel (attachment) | Archivo `.xlsx` con columnas ID, Usuario, Estado, Fecha |
-| `/api/reports/pdf/` | GET | Descargar reporte PDF (attachment) | Archivo `.pdf` con listado de reservas |
+| Ruta                   | Método | Descripción                          | Respuesta                  |
+|------------------------|--------|--------------------------------------|----------------------------|
+| `/api/reports/excel/`  | GET    | Descargar reporte Excel (attachment) | Archivo `.xlsx` con reservas (campos completos y formato estético)|
+| `/api/reports/pdf/`    | GET    | Descargar reporte PDF (attachment)   | Archivo `.pdf` con reservas (campos completos y formato estético)|
 
 Archivos relevantes:
 - `reports/serializers.py` (ReservaSerializer)
-- `reports/views.py` (ReservaViewSet, ReporteExcelView, ReportePDFView)
-- `reports/urls.py` (router y rutas de reportes)
+- `reports/views.py` (ReporteExcelView, ReportePDFView)
+- `reports/urls.py` (rutas de reportes)
+---
+
+## 🚦 Pruebas de rendimiento con Locust
+
+1. Instala Locust:
+```powershell
+pip install locust
+```
+
+2. Ejecuta Locust desde la raíz del proyecto:
+```powershell
+locust -f locust/locust_reports.py
+```
+
+3. Abre tu navegador en [http://localhost:8089](http://localhost:8089) y configura los usuarios concurrentes para simular carga sobre los endpoints de reportes.
+
+El archivo de pruebas ya está preparado para simular descargas concurrentes de Excel y PDF.
 
 ---
 
