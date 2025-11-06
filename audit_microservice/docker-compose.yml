@@ -1,0 +1,32 @@
+services:
+  audit_service:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-flask
+    container_name: audit_service
+    restart: always
+    #verficiar los puertos
+    ports:
+      - "5004:5000"
+    #no estoy segura si esta bien
+    environment:
+      MONGO_URI: mongodb://admin:admin123@mongodb_auditoria:27017
+      MONGO_DB: audit_db
+    depends_on:
+      - mongodb_auditoria
+
+  mongodb_auditoria:
+    image: mongo:6
+    container_name: mongodb_auditoria
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: audit_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

@@ -1,0 +1,35 @@
+services:
+  auth_service:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-flask
+    container_name: auth_service
+    restart: always
+    #verificar ports
+    ports:
+      - "5000:5000"
+    environment:
+      APP_ENV: development
+      DB_HOST: mysql_auth   
+      DB_DATABASE: auth_db
+      DB_USERNAME: auth_user        
+      DB_PASSWORD: auth_pass
+    depends_on:
+      - mysql_auth
+
+  mysql_auth:
+    image: mysql:8.0
+    container_name: mysql_auth
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: auth_db
+      MYSQL_USER: auth_user
+      MYSQL_PASSWORD: auth_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - auth_data:/var/lib/mysql
+      
+volumes:
+  auth_data:

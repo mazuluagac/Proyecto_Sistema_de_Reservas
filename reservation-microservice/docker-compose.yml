@@ -1,0 +1,36 @@
+services:
+  reservation_service:
+    build: 
+      context: .
+      dockerfile: dockerfiles/Dockerfile-laravel
+    container_name: reservation_service
+    restart: always
+    ports:
+    #verificar el puerto
+      - "8100:80"
+    #no estoy segura de las variables de entorno
+    environment:
+      APP_ENV: development
+      DB_HOST: mysql_reservas
+      DB_DATABASE: reservas_db
+      DB_USERNAME: reservas_user        
+      DB_PASSWORD: reservas_pass
+    depends_on:
+      - mysql_reservas  
+
+  mysql_reservas:
+    image: mysql:8.0
+    container_name: mysql_reservas
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: reservas_db
+      MYSQL_USER: reservas_user
+      MYSQL_PASSWORD: reservas_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - reservas_data:/var/lib/mysql
+
+volumes:
+  reservas_data:
