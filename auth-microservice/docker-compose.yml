@@ -1,35 +1,43 @@
 services:
-  auth_service:
+  auth-service:
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile-flask
-    container_name: auth_service
+      dockerfile: Dockerfile
+    container_name: auth-service
     restart: always
-    #verificar ports
     ports:
-      - "5000:5000"
-    environment:
-      APP_ENV: development
-      DB_HOST: mysql_auth   
-      DB_DATABASE: auth_db
-      DB_USERNAME: auth_user        
-      DB_PASSWORD: auth_pass
+      - "8000:8000"     # Puerto expuesto correctamente
+    volumes:
+      - .:/var/www/auth-service          # Código fuente
+      - /var/www/auth-service/vendor     # Vendor del contenedor (evita sobrescritura)
     depends_on:
-      - mysql_auth
+      auth-db:
+        condition: service_healthy        # Espera a que MySQL esté listo
+    networks:
+      - app_net   
 
-  mysql_auth:
-    image: mysql:8.0
-    container_name: mysql_auth
+  auth-db:
+    image: mysql:8
+    container_name: auth-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: auth_db
-      MYSQL_USER: auth_user
-      MYSQL_PASSWORD: auth_pass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - auth_data:/var/lib/mysql
-      
+    networks:
+      - app_net  
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+networks:
+  app_net:
+    driver: bridge
+
 volumes:
   auth_data:

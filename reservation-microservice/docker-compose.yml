@@ -1,36 +1,44 @@
 services:
-  reservation_service:
-    build: 
+  reservation-service:
+    build:
       context: .
-      dockerfile: dockerfiles/Dockerfile-laravel
-    container_name: reservation_service
+      dockerfile: Dockerfile
+    container_name: reservation-service
     restart: always
     ports:
-    #verificar el puerto
-      - "8100:80"
-    #no estoy segura de las variables de entorno
-    environment:
-      APP_ENV: development
-      DB_HOST: mysql_reservas
-      DB_DATABASE: reservas_db
-      DB_USERNAME: reservas_user        
-      DB_PASSWORD: reservas_pass
-    depends_on:
-      - mysql_reservas  
-
-  mysql_reservas:
-    image: mysql:8.0
-    container_name: mysql_reservas
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: reservas_db
-      MYSQL_USER: reservas_user
-      MYSQL_PASSWORD: reservas_pass
-    ports:
-      - "3307:3306"
+    #Puerto en tu PC : Puerto en el contenedor
+      - "8002:8002"   
     volumes:
-      - reservas_data:/var/lib/mysql
+      - .:/var/www/reservation-service
+      - /var/www/reservation-service/vendor
+    depends_on:
+      reservation-db:
+        condition: service_healthy
+    networks:
+      - app_net   
+
+  reservation-db:
+    image: mysql:8
+    container_name: reservation-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: reservation_db
+    ports:
+      - "3308:3306"   
+    volumes:
+      - reservation_data:/var/lib/mysql
+    networks:
+      - app_net  
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+networks:
+  app_net:
+    driver: bridge
 
 volumes:
-  reservas_data:
+  reservation_data:
