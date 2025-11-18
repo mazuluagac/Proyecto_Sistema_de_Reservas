@@ -72,7 +72,7 @@ def index():
     return "Microservicio de Auditoría en ejecución", 200
 
 # -----------------------------------------------------------
-# 4️⃣ Ejecutar servidor
+# 4️ Ejecutar servidor
 # -----------------------------------------------------------
 if __name__ == '__main__':
     app.run(port=5004, debug=True)

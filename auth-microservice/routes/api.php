@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GatewayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,3 +48,8 @@ Route::middleware(['auth:sanctum', 'role:usuario'])->group(function () {
     // Los usuarios regulares solo pueden ver estadísticas básicas
     Route::get('/usuarios/stats', [UserController::class, 'stats']);
 });
+
+// Gateway genérico para microservicios 
+Route::match(['get', 'post', 'put', 'delete', 'patch'],
+    '/gateway/{service}/{endpoint?}', [GatewayController::class, 'proxy'])
+    ->where('endpoint', '.*');

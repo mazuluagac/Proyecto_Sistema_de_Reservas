@@ -1,8 +1,92 @@
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 import pymysql
+import requests
+from functools import wraps
+from datetime import datetime
 
 app = Flask(__name__)
+
+# ===== CONFIGURACIÓN DEL GATEWAY =====
+GATEWAY_URL = 'http://localhost:8000'  # URL del gateway
+API_KEY = 'MiSuperLlaveUltraSecreta_z1127'  # Tu API Key
+MICROSERVICE_NAME = 'notifications'  # Nombre de este microservicio
+
+# ===== FUNCIONES DE AUTENTICACIÓN CON GATEWAY =====
+def validate_api_key(f):
+    """Decorador para validar API_KEY en las solicitudes internas"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        api_key = request.headers.get('X-API-Key')
+        if not api_key or api_key != API_KEY:
+            return jsonify({'error': 'API Key inválida o no proporcionada'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+def get_gateway_headers():
+    """Retorna los headers necesarios para comunicarse con el gateway"""
+    return {
+        'X-API-Key': API_KEY,
+        'Content-Type': 'application/json',
+        'X-Service': MICROSERVICE_NAME,
+        'Timestamp': datetime.now().isoformat()
+    }
+
+def call_gateway_service(service_name, endpoint, method='GET', data=None, params=None):
+    """
+    Realiza una llamada a otro microservicio a través del gateway
+    
+    Args:
+        service_name: Nombre del servicio (ej: 'reservation', 'auth', 'users')
+        endpoint: Ruta del endpoint del servicio (ej: '/get_user/1')
+        method: Método HTTP (GET, POST, PUT, DELETE)
+        data: Datos a enviar en POST/PUT
+        params: Parámetros de query
+    
+    Returns:
+        Response del servicio o None si hay error
+    """
+    try:
+        url = f"{GATEWAY_URL}/{service_name}{endpoint}"
+        headers = get_gateway_headers()
+        
+        if method.upper() == 'GET':
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+        elif method.upper() == 'POST':
+            response = requests.post(url, json=data, headers=headers, timeout=10)
+        elif method.upper() == 'PUT':
+            response = requests.put(url, json=data, headers=headers, timeout=10)
+        elif method.upper() == 'DELETE':
+            response = requests.delete(url, headers=headers, params=params, timeout=10)
+        else:
+            return None
+        
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error al comunicarse con {service_name}: {str(e)}")
+        return None
+
+def notify_gateway(event_type, data):
+    """
+    Notifica al gateway sobre eventos importantes del microservicio
+    
+    Args:
+        event_type: Tipo de evento (ej: 'email_sent', 'email_failed')
+        data: Datos del evento
+    """
+    try:
+        event_data = {
+            'service': MICROSERVICE_NAME,
+            'event_type': event_type,
+            'timestamp': datetime.now().isoformat(),
+            'data': data
+        }
+        url = f"{GATEWAY_URL}/events"
+        headers = get_gateway_headers()
+        requests.post(url, json=event_data, headers=headers, timeout=5)
+    except Exception as e:
+        print(f"Error al notificar al gateway: {str(e)}")
 
 # Configuración del correo electrónico
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -320,6 +404,89 @@ def get_user_email_endpoint(user_id):
         return jsonify({'user_id': user_id, 'email': email}), 200
     else:
         return jsonify({'mensaje': 'Usuario no encontrado'}), 404
+
+# ===== ENDPOINTS PARA COMUNICACIÓN CON GATEWAY =====
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint para el gateway"""
+    return jsonify({
+        'status': 'healthy',
+        'service': MICROSERVICE_NAME,
+        'version': '1.0.0',
+        'timestamp': datetime.now().isoformat()
+    }), 200
+
+@app.route('/register', methods=['POST'])
+@validate_api_key
+def register_service():
+    """Registra este microservicio con el gateway"""
+    try:
+        service_info = {
+            'name': MICROSERVICE_NAME,
+            'url': request.host_url,
+            'endpoints': [
+                '/send_reservation_notification/<reservation_id>',
+                '/send_all_reservation_notifications',
+                '/get_user_email/<user_id>',
+                '/health'
+            ],
+            'timestamp': datetime.now().isoformat()
+        }
+        return jsonify({
+            'mensaje': 'Microservicio registrado exitosamente',
+            'service_info': service_info
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_service_info', methods=['GET'])
+def get_service_info():
+    """Retorna información del microservicio"""
+    return jsonify({
+        'name': MICROSERVICE_NAME,
+        'description': 'Microservicio de notificaciones por email',
+        'endpoints': {
+            'send_notification': {
+                'path': '/send_reservation_notification/<reservation_id>',
+                'method': 'POST',
+                'description': 'Envía notificación de reserva'
+            },
+            'get_all_notifications': {
+                'path': '/send_all_reservation_notifications',
+                'method': 'GET',
+                'description': 'Envía notificaciones de todas las reservas'
+            },
+            'health': {
+                'path': '/health',
+                'method': 'GET',
+                'description': 'Verifica el estado del servicio'
+            }
+        }
+    }), 200
+
+@app.route('/notify_reservation_status/<int:reservation_id>', methods=['POST'])
+@validate_api_key
+def notify_reservation_status(reservation_id):
+    """
+    Endpoint que recibe notificaciones del gateway sobre cambios de estado en reservas
+    Se puede llamar desde otros microservicios a través del gateway
+    """
+    try:
+        data = request.get_json()
+        new_status = data.get('status')
+        
+        if not new_status:
+            return jsonify({'error': 'Status es requerido'}), 400
+        
+        # Obtener información de la reserva y enviar notificación
+        result = send_reservation_notification(reservation_id)
+        
+        return jsonify({
+            'mensaje': f'Notificación enviada para reserva {reservation_id}',
+            'nuevo_status': new_status
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
