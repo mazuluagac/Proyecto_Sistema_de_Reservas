@@ -25,6 +25,32 @@ Este proyecto implementa una arquitectura distribuida basada en **microservicios
 
 ---
 
+## 🐳 Nueva integración con Docker Compose
+
+Además de poder ejecutar cada microservicio de forma independiente, el proyecto ahora incluye un archivo docker-compose.yml que permite:
+
+- Levantar todos los microservicios con un solo comando.
+
+- Crear y vincular automáticamente las bases de datos necesarias.
+
+- Ejecutar los servicios en su propio contenedor aislado.
+
+- Simplificar el despliegue y las pruebas del sistema completo.
+
+### ▶️ Ejecutar todo el ecosistema
+
+Desde la raíz del proyecto:
+
+```bash
+docker-compose up 
+```
+Puedes detener todo el stack con:
+
+```bash
+docker-compose down 
+```
+---
+
 ## ⚙️ Ejecución
 
 Cada microservicio es **independiente**, por lo que debe ejecutarse en su propio entorno.
