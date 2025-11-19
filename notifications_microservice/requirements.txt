@@ -1,4 +1,7 @@
-Flask
-python-dotenv
-email-validator
-pymysql
+Flask==3.0.0
+Flask-Mail==0.9.1
+python-dotenv==1.0.0
+email-validator==2.1.0
+pymysql==1.1.0
+requests==2.31.0
+gunicorn==21.2.0

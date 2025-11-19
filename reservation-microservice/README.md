@@ -138,11 +138,12 @@ Ejemplo (crear reserva):
 ```json
 POST /api/reservas
 {
-	"user_id": 1,
-	"fecha": "2025-10-10",
-	"hora_inicio": "14:00",
-	"hora_fin": "16:00",
-	"descripcion": "Reunión de proyecto"
+  "usuario_id": 1,
+  "nombre_usuario": "Pepito Perez",
+  "fecha_inicio": "2025-11-20",
+  "fecha_fin": "2025-11-20",
+  "descripcion": "Reserva de sala de reuniones",
+  "estado": "pendiente"
 }
 ```
 
@@ -150,13 +151,19 @@ Respuesta (ejemplo):
 
 ```json
 {
-	"id": 42,
-	"user_id": 1,
-	"fecha": "2025-10-10",
-	"hora_inicio": "14:00",
-	"hora_fin": "16:00",
-	"descripcion": "Reunión de proyecto",
-	"created_at": "2025-10-03T08:00:00Z"
+  "success": true,
+  "message": "Reserva creada exitosamente",
+  "data": {
+    "usuario_id": 1,
+    "nombre_usuario": "Pepito Perez",
+    "fecha_inicio": "2025-11-20T00:00:00.000000Z",
+    "fecha_fin": "2025-11-20T00:00:00.000000Z",
+    "descripcion": "Reserva de sala de reuniones",
+    "estado": "pendiente",
+    "updated_at": "2025-11-19T06:54:32.000000Z",
+    "created_at": "2025-11-19T06:54:32.000000Z",
+    "id": 1
+  }
 }
 ```
 

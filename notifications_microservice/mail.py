@@ -4,13 +4,15 @@ import pymysql
 import requests
 from functools import wraps
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
 # ===== CONFIGURACIÓN DEL GATEWAY =====
-GATEWAY_URL = 'http://localhost:8000'  # URL del gateway
-API_KEY = 'MiSuperLlaveUltraSecreta_z1127'  # Tu API Key
-MICROSERVICE_NAME = 'notifications'  # Nombre de este microservicio
+GATEWAY_URL = os.getenv('GATEWAY_URL', 'http://auth-service:8000')
+API_KEY = os.getenv('API_KEY', 'MiSuperLlaveUltraSecreta_z1127')
+MICROSERVICE_NAME = 'notifications'
+
 
 # ===== FUNCIONES DE AUTENTICACIÓN CON GATEWAY =====
 def validate_api_key(f):
@@ -89,29 +91,31 @@ def notify_gateway(event_type, data):
         print(f"Error al notificar al gateway: {str(e)}")
 
 # Configuración del correo electrónico
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'pruebasopsmz@gmail.com'
-app.config['MAIL_PASSWORD'] = 'fnop mcib fknp vjhb'
-app.config['MAIL_DEFAULT_SENDER'] = 'pruebasopsmz@gmail.com'
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', '587'))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'pruebasopsmz@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'fnop mcib fknp vjhb')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'pruebasopsmz@gmail.com')
 app.config['MAIL_ASCII_ATTACHMENTS'] = False
 
-# Configuración de las bases de datos
+# Configuración de las bases de datos usando variables de entorno
 DB_CONFIG_AUTH = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
-    'database': 'auth_db',  # Base de datos de autenticación
+    'host': os.getenv('AUTH_DB_HOST', 'auth-db'),
+    'user': os.getenv('AUTH_DB_USER', 'root'),
+    'password': os.getenv('AUTH_DB_PASSWORD', 'secret'),
+    'database': os.getenv('AUTH_DB_NAME', 'auth_db'),
+    'port': int(os.getenv('AUTH_DB_PORT', '3306')),
     'charset': 'utf8mb4'
 }
 
 DB_CONFIG_RESERVATION = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
-    'database': 'reservation_db',  # Base de datos de reservas
+    'host': os.getenv('RESERVATION_DB_HOST', 'reservation-db'),
+    'user': os.getenv('RESERVATION_DB_USER', 'root'),
+    'password': os.getenv('RESERVATION_DB_PASSWORD', 'secret'),
+    'database': os.getenv('RESERVATION_DB_NAME', 'reservation_db'),
+    'port': int(os.getenv('RESERVATION_DB_PORT', '3306')),
     'charset': 'utf8mb4'
 }
 
@@ -489,4 +493,5 @@ def notify_reservation_status(reservation_id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Solo para desarrollo local sin Docker
+    app.run(debug=True, host='0.0.0.0', port=5000)

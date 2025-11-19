@@ -15,6 +15,11 @@ use App\Http\Controllers\ReservaController;
 |
 */
 
+#Ruta healthcheck
+Route::get('/health', function () {
+    return response()->json(['status' => 'OK'], 200);
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

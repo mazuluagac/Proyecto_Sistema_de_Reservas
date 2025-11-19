@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
 from flask.json.provider import DefaultJSONProvider
+import os
 import json
 
 # -----------------------------------------------------------
@@ -10,9 +11,14 @@ import json
 # -----------------------------------------------------------
 app = Flask(__name__)
 
-# Conexión a MongoDB (base de datos local)
-client = MongoClient("mongodb://localhost:27017")
-db = client["microservicios"]
+# Leer variables del entorno enviadas desde docker-compose
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+MONGO_DB = os.getenv("MONGO_DB", "audit_db")
+
+client = MongoClient(MONGO_URI)
+db = client[MONGO_DB]
+
+# Nombre de la colección
 auditoria_collection = db["audit_db_test"]
 
 # -----------------------------------------------------------
@@ -31,41 +37,33 @@ app.json = CustomJSONProvider(app)
 # -----------------------------------------------------------
 @app.route('/audit', methods=['POST'])
 def log_audit():
-    """
-    Registra una acción realizada por el sistema o un usuario.
-    Por ejemplo: crear_usuario, login, logout, actualizar_perfil, etc.
-    """
     data = request.get_json()
 
-    # Validar que los campos mínimos existan
     if not data or 'action' not in data:
         return jsonify({"error": "Faltan campos requeridos (action)"}), 400
 
-    # Crear evento de auditoría
     evento = {
         "action": data['action'],
-        "user_id": data['user_id'],
+        "user_id": data.get('user_id', None),   # ← evita errores si no viene
         "fecha": datetime.now().isoformat(),
         "details": data.get('details', {})
     }
 
-    # Guardar evento en MongoDB
     result = auditoria_collection.insert_one(evento)
     evento["_id"] = str(result.inserted_id)
 
     return jsonify({"message": "Evento de auditoría registrado", "event": evento}), 201
 
 # -----------------------------------------------------------
-# 2️ Endpoint para listar todos los eventos registrados
+# 2️ Endpoint para listar eventos
 # -----------------------------------------------------------
 @app.route('/audit', methods=['GET'])
 def get_audit_logs():
-
-    # Devuelve todos los eventos registrados en la base de datos.
     eventos = list(auditoria_collection.find())
     return jsonify({"total": len(eventos), "events": eventos}), 200
+
 # -----------------------------------------------------------
-# 3️ Endpoint raíz (para verificar estado del servicio)
+# 3️ Endpoint raíz
 # -----------------------------------------------------------
 @app.route('/')
 def index():

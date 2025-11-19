@@ -2,22 +2,23 @@ services:
   audit_service:
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile-flask
+      dockerfile: Dockerfile
     container_name: audit_service
     restart: always
-    #verficiar los puertos
     ports:
-      - "5004:5000"
-    #no estoy segura si esta bien
+      - "5004:5004"
     environment:
-      MONGO_URI: mongodb://admin:admin123@mongodb_auditoria:27017
+      MONGO_URI: mongodb://admin:admin123@mongodb_audit:27017/audit_db?authSource=admin
       MONGO_DB: audit_db
     depends_on:
-      - mongodb_auditoria
+      mongodb_audit:
+        condition: service_healthy
+    networks:
+      - audit_network
 
-  mongodb_auditoria:
+  mongodb_audit:
     image: mongo:6
-    container_name: mongodb_auditoria
+    container_name: mongodb_audit
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -27,6 +28,17 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - audit_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
 volumes:
   mongo_data:
+
+networks:
+  audit_network:
+    driver: bridge

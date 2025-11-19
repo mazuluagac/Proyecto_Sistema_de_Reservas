@@ -17,6 +17,11 @@ use App\Http\Controllers\GatewayController;
 |
 */
 
+// Ruta de healthcheck para Docker y el API Gateway
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok'], 200);
+});
+
 // Public auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -50,6 +55,12 @@ Route::middleware(['auth:sanctum', 'role:usuario'])->group(function () {
 });
 
 // Gateway genérico para microservicios 
-Route::match(['get', 'post', 'put', 'delete', 'patch'],
-    '/gateway/{service}/{endpoint?}', [GatewayController::class, 'proxy'])
-    ->where('endpoint', '.*');
+//Route::match(['get', 'post', 'put', 'delete', 'patch'],
+//    '/gateway/{service}/{endpoint?}', [GatewayController::class, 'proxy'])
+//    ->where('endpoint', '.*');
+
+Route::middleware('gateway.key')->match(
+['get', 'post', 'put', 'delete', 'patch'],
+    '/gateway/{service}/{endpoint?}',
+    [GatewayController::class, 'proxy']
+)->where('endpoint', '.*');
