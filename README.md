@@ -50,7 +50,7 @@ Puedes detener todo el stack con:
 docker-compose down 
 ```
 ### 🐳 Arquitectura Docker
-
+```scss
 ┌──────────────────────┐
 │    docker-compose     │
 └───────────────────────┘
@@ -65,7 +65,7 @@ docker-compose down
       ▼                ▼               ▼                 ▼                 ▼
   MySQL Auth       MySQL Res.      MySQL Reports     MySQL Auth / MySQL Res.        MongoDB
  (auth_db)         (reservation_db)   (reservation_db)     (auth_db / reservation_db )    (audit_db)
-
+```
 ---
 
 ## ⚙️ Ejecución
