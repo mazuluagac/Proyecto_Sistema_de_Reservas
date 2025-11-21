@@ -88,7 +88,7 @@ Ejecuta cada microservicio según las instrucciones específicas en su respectiv
 
 ## 🚀 Objetivo general
 
-Aplicar una arquitectura basada en **microservicios desacoplados**, que permita escalar, mantener y desplegar de manera independiente los módulos del sistema.
+Construir un sistema basado en **microservicios desacoplados**, capaz de escalar y evolucionar por módulos, manteniendo independencia en despliegue, mantenimiento y pruebas.
 
 ---
 
