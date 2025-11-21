@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'healthy',
+        'service' => 'Reservation Service'
+    ]);
+});
 
 Route::get('/', function () {
     return view('welcome');

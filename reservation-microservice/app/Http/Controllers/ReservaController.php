@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Reserva;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ReservaController extends Controller
 {
@@ -26,6 +28,7 @@ class ReservaController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // 1. Validación
         $request->validate([
             'usuario_id' => 'required|integer',
             'nombre_usuario' => 'required|string|max:100',
@@ -35,6 +38,7 @@ class ReservaController extends Controller
             'estado' => 'nullable|in:pendiente,confirmada,cancelada'
         ]);
 
+        // 2. Crear Reserva
         $reserva = Reserva::create([
             'usuario_id' => $request->usuario_id,
             'nombre_usuario' => $request->nombre_usuario,
@@ -44,6 +48,28 @@ class ReservaController extends Controller
             'estado' => $request->estado ?? 'pendiente'
         ]);
 
+        // 3. Notificar al Microservicio (Intento silencioso)
+        try {
+            $notificationUrl = env('NOTIFICATIONS_SERVICE_URL');
+            $apiKey = env('API_KEY');
+
+            if ($notificationUrl) {
+                // Aumentamos el timeout a 10 segundos para darle tiempo a Gmail
+                Http::timeout(10) 
+                    ->withHeaders([
+                        'X-API-Key' => $apiKey,
+                        'Content-Type' => 'application/json'
+                    ])
+                    ->post("{$notificationUrl}/send_reservation_notification/{$reserva->id}");
+                
+                Log::info("Notificación enviada para reserva ID: {$reserva->id}");
+            }
+        } catch (\Exception $e) {
+            // Si falla (timeout o error de red), solo lo logueamos, no rompemos la reserva.
+            Log::error("No se pudo enviar la notificación: " . $e->getMessage());
+        }
+
+        // 4. Respuesta Limpia
         return response()->json([
             'success' => true,
             'message' => 'Reserva creada exitosamente',

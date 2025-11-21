@@ -63,5 +63,7 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        #se establece el middleware para validar la llave del gateway
+        'gateway.auth' => \App\Http\Middleware\ValidateGatewayKey::class,
     ];
 }

@@ -16,8 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
+from datetime import datetime
+
+# Vista simple para Health Check
+def health_check(request):
+    return JsonResponse({
+        'status': 'healthy',
+        'service': 'reports-service',
+        'timestamp': datetime.now().isoformat()
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Ruta de salud (Pública gracias al middleware)
+    path('health', health_check),
+    
+    # Rutas de la API (Protegidas por el middleware)
     path('api/reports/', include('reports.urls')),
 ]

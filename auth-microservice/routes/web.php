@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Ruta pública para el Health Check del Gateway
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'healthy',
+        'service' => 'Auth Service'
+    ]);
+});
+
 Route::get('/', function () {
     return view('welcome');
 });

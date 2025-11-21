@@ -1,5 +1,45 @@
 services:
   # ===============================
+  # API GATEWAY
+  # ===============================
+  api-gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "3000:3000"  # ÚNICO puerto público
+    environment:
+      PORT: "3000"
+      DEBUG: "False"
+      
+      # UNA SOLA API KEY para todos los servicios
+      API_KEY: "xK7mP9nQ2wR5tY8uI1oL4jH6gS3aZ0bVcX8zL2kJ5hG"
+      
+      # URLs de los microservicios (solo accesibles internamente)
+      AUTH_SERVICE_URL: http://auth-service:8000
+      RESERVATION_SERVICE_URL: http://reservation-service:8002
+      NOTIFICATIONS_SERVICE_URL: http://notifications-service:5000
+      REPORTS_SERVICE_URL: http://reports-service:8001
+      AUDIT_SERVICE_URL: http://audit-service:5004
+      
+    depends_on:
+      - auth-service
+      - reservation-service
+      - notifications-service
+      - reports-service
+      - audit-service
+    networks:
+      - app_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ===============================
   # AUTH MICROSERVICE
   # ===============================
   auth-service:
@@ -8,8 +48,14 @@ services:
       dockerfile: Dockerfile
     container_name: auth-service
     restart: always
-    ports:
-      - "8000:8000"
+    # CAMBIO: Ya NO exponer puerto públicamente
+    expose:
+      - "8000"
+    # ports:
+    #   - "8000:8000"  # ← Comentado - solo accesible internamente
+    environment:
+      # LA MISMA API KEY
+      API_KEY: "xK7mP9nQ2wR5tY8uI1oL4jH6gS3aZ0bVcX8zL2kJ5hG"
     volumes:
       - ./auth-microservice:/var/www/auth-service
       - /var/www/auth-service/vendor
@@ -32,7 +78,7 @@ services:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: auth_db
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Puede quedar expuesto para acceso directo a BD
     volumes:
       - auth_data:/var/lib/mysql
     networks:
@@ -52,8 +98,16 @@ services:
       dockerfile: Dockerfile
     container_name: reservation-service
     restart: always
-    ports:
-      - "8002:8002"
+    # CAMBIO: Ya NO exponer puerto públicamente
+    expose:
+      - "8000"
+    # ports:
+    #   - "8002:8000"  # ← Comentado - solo accesible internamente
+    environment:
+      # LA MISMA API KEY
+      API_KEY: "xK7mP9nQ2wR5tY8uI1oL4jH6gS3aZ0bVcX8zL2kJ5hG"
+      # Conexión a la base de datos de notificaciones
+      NOTIFICATIONS_SERVICE_URL: "http://notifications-service:5000"
     volumes:
       - ./reservation-microservice:/var/www/reservation-service
       - /var/www/reservation-service/vendor
@@ -76,7 +130,7 @@ services:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: reservation_db
     ports:
-      - "3308:3306"
+      - "3308:3306"  # Puede quedar expuesto para acceso directo a BD
     volumes:
       - reservation_data:/var/lib/mysql
     networks:
@@ -96,40 +150,52 @@ services:
       dockerfile: Dockerfile
     container_name: reports-service
     restart: always
-    ports:
-      - "8001:8001"
+    # CAMBIO: Ya NO exponer puerto públicamente
+    expose:
+      - "8001"
+    # ports:
+    #   - "8001:8001"  # ← Comentado - solo accesible internamente
     environment:
+      # LA MISMA API KEY
+      API_KEY: "xK7mP9nQ2wR5tY8uI1oL4jH6gS3aZ0bVcX8zL2kJ5hG"
+      
       DEBUG: "False"
       DJANGO_ENV: production
-
-      # conexión a la base de reservas
+      
+      # Conexión a la base de reservas
       DB_HOST: reservation-db
       DB_NAME: reservation_db
       DB_USER: root
       DB_PASSWORD: secret
       DB_PORT: "3306"
-
+      
     depends_on:
       reservation-db:
         condition: service_healthy
     networks:
       - app_net
 
-# ===============================
-# AUDIT MICROSERVICE
-# ===============================
-
-  audit_service:
+  # ===============================
+  # AUDIT MICROSERVICE
+  # ===============================
+  audit-service:
     build:
       context: ./audit_microservice
       dockerfile: Dockerfile
-    container_name: audit_service
+    container_name: audit-service
     restart: always
-    ports:
-      - "5004:5004"
+    # CAMBIO: Ya NO exponer puerto públicamente
+    expose:
+      - "5004"
+    # ports:
+    #   - "5004:5004"  # ← Comentado - solo accesible internamente
     environment:
+      # LA MISMA API KEY
+      API_KEY: "xK7mP9nQ2wR5tY8uI1oL4jH6gS3aZ0bVcX8zL2kJ5hG"
+      
       MONGO_URI: mongodb://admin:admin123@mongodb_audit:27017/audit_db?authSource=admin
       MONGO_DB: audit_db
+      
     depends_on:
       mongodb_audit:
         condition: service_healthy
@@ -145,7 +211,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: admin123
       MONGO_INITDB_DATABASE: audit_db
     ports:
-      - "27017:27017"
+      - "27017:27017"  # Puede quedar expuesto para acceso directo a BD
     volumes:
       - mongo_data:/data/db
     networks:
@@ -156,21 +222,25 @@ services:
       timeout: 10s
       retries: 5
 
-# ===============================
-# NOTIFICATIONS  MICROSERVICE
-# ===============================
-
+  # ===============================
+  # NOTIFICATIONS MICROSERVICE
+  # ===============================
   notifications-service:
     build:
       context: ./notifications_microservice
       dockerfile: Dockerfile
     container_name: notifications-service
     restart: always
-    ports:
-      - "5000:5000"
+    # CAMBIO: Ya NO exponer puerto públicamente
+    expose:
+      - "5000"
+    # ports:
+    #   - "5000:5000"  # ← Comentado - solo accesible internamente
     environment:
-
-      #Configuración del servidor de correo
+      # LA MISMA API KEY
+      API_KEY: "xK7mP9nQ2wR5tY8uI1oL4jH6gS3aZ0bVcX8zL2kJ5hG"
+      
+      # Configuración del servidor de correo
       MAIL_SERVER: smtp.gmail.com
       MAIL_PORT: "587"
       MAIL_USE_TLS: "True"
@@ -178,25 +248,24 @@ services:
       MAIL_USERNAME: pruebasopsmz@gmail.com
       MAIL_PASSWORD: "fnop mcib fknp vjhb"
       MAIL_DEFAULT_SENDER: pruebasopsmz@gmail.com
-
-      #Gateway API
+      
+      # Gateway API (legacy - puede ser removido si no se usa)
       GATEWAY_URL: http://auth-service:8000
-      API_KEY: MiSuperLlaveUltraSecreta_z1127 
-
+      
       # Variables de entorno para conectar a MySQL de AUTH
       AUTH_DB_HOST: auth-db
       AUTH_DB_NAME: auth_db
       AUTH_DB_USER: root
       AUTH_DB_PASSWORD: secret
       AUTH_DB_PORT: "3306"
-
+      
       # Variables de entorno para conectar a MySQL de RESERVAS
       RESERVATION_DB_HOST: reservation-db
       RESERVATION_DB_NAME: reservation_db
       RESERVATION_DB_USER: root
       RESERVATION_DB_PASSWORD: secret
       RESERVATION_DB_PORT: "3306"
-
+      
     depends_on:
       auth-db:
         condition: service_healthy

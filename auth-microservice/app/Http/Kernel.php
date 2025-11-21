@@ -67,7 +67,8 @@ class Kernel extends HttpKernel
         //se asigna el alias 'role' al middleware RoleMiddleware
         //esto permite usar 'role' en las rutas para protegerlas por rol
         'role' => \App\Http\Middleware\RoleMiddleware::class,
-        //middleware para validar la llave API en las solicitudes entrantes
-        'gateway.key' => \App\Http\Middleware\ValidateGatewayApiKey::class,
+        //se establece el middleware para validar la llave del gateway
+        'gateway.auth' => \App\Http\Middleware\ValidateGatewayKey::class,
+        
     ];
 }
