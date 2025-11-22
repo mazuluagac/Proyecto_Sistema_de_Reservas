@@ -8,6 +8,7 @@ Este proyecto implementa una arquitectura distribuida basada en **microservicios
 
 | Microservicio | Descripción | Framework | Base de Datos |
 |----------------|-------------|------------|----------------|
+| **API Gateway** | Punto central de entrada. Redirige solicitudes a los demás servicios. Maneja CORS, headers y seguridad. | Flask | — |
 | **Auth + Usuarios** | Maneja la autenticación, registro y gestión de usuarios. | Laravel | MySQL |
 | **Reservas** | Gestiona la creación, actualización y consulta de reservas. | Laravel | MySQL |
 | **Reportes** | Genera reportes en PDF y Excel con datos de reservas simulados. | Django REST Framework | MySQL |
@@ -20,7 +21,7 @@ Este proyecto implementa una arquitectura distribuida basada en **microservicios
 
 - **Laravel 8** — PHP framework para los servicios Auth y Reservas.  
 - **Django REST Framework (DRF)** — API para la generación de reportes.  
-- **Flask** — Microframework ligero para Notificaciones y Auditoría.  
+- **Flask** — Microframework ligero para Notificaciones, Auditoría y API Gateway.  
 - **MySQL** y **MongoDB** — Bases de datos relacional y NoSQL.  
 
 ---
@@ -153,6 +154,7 @@ Ejemplo de puertos sugeridos:
 
 | Servicio | Puerto |
 |-----------|--------|
+| API Gateway | 3000 |
 | Auth | 8000 |
 | Reservas | 8002 |
 | Reportes | 8001 |
