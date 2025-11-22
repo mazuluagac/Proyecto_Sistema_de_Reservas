@@ -113,11 +113,11 @@ Redirige las peticiones hacia cada microservicio según la ruta:
   ┌───────────────────┐         ┌───────────────────┐
   │  Auth Service     │         │ Reservation Serv. │
   │    (Laravel)      │         │     (Laravel)     │
-  └─────────┬─────────┘         └─────────┬─────────┘
+  └─────────┬─────────┘         └───────────┬───────┘
             │                               │
             ▼                               ▼
     ┌──────────────┐                ┌───────────────┐
-    │  MySQL Auth  │               │ MySQL Reserv. │
+    │  MySQL Auth  │                │ MySQL Reserv. │
     └──────────────┘                └───────────────┘
                                             │
                                             ▼
