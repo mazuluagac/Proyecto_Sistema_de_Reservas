@@ -140,7 +140,7 @@ Redirige las peticiones hacia cada microservicio según la ruta:
                        └──────────────┬──────────────┘
                                       ▼
                                ┌──────────────┐
-                               │   MongoDB     │
+                               │   MongoDB    │
                                └──────────────┘
 
 ```
