@@ -157,12 +157,6 @@ GET /health
   }
 }
 ```
-
-#### Gateway Info
-```http
-GET /gateway/info
-```
-
 ### Proxied Services
 
 #### Autenticación
@@ -216,9 +210,6 @@ api_gateway/
 ├── requirements.txt    # Dependencias Python
 └── README.md          # Este archivo
 ```
-
-
-
 ### Hacer Rutas Públicas
 
 Añadir al array `PUBLIC_ROUTES`:
@@ -367,3 +358,10 @@ curl -X POST http://localhost:3000/api/reservas \
     "num_personas": 4
   }'
 ```
+---
+
+## 🧾 Autor
+
+- Autor: Manuela Zuluaga Cardona
+
+---
