@@ -75,6 +75,7 @@ docker-compose down
 
 ```
 Nota: Para validar los nombres de los servicios acceda al docker-compose
+
 ---
 ## 🌉 API Gateway — Punto central de entrada al sistema
 
